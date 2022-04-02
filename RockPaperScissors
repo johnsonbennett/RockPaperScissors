@@ -1,0 +1,227 @@
+package edu.missouristate;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.security.SecureRandom;
+
+public class RockPaperScissors{
+	BufferedReader bufferedReader=null;
+	SecureRandom random=new SecureRandom();
+	String message ="Welcome to Rock Paper Scissors!";
+
+	public RockPaperScissors() {
+	}
+	public void displayMainMenu() {
+		//Clear the console
+		clearTheConsole();
+		
+		System.out.println("*******Rock Paper Scissors**********");
+		System.out.println("1.Play Game!");
+		System.out.println("\n");
+		System.out.println("2.Exit");
+		//If a message exist, then show it and then clear it out
+		if(message!=null && message.length()>0) {
+			System.out.println(message);
+			message="";
+		}
+		System.out.println("Please choose a menu option");
+	}
+	private void playGame() throws Exception{
+		try {
+			//Initialize bufferedReader
+			bufferedReader = new BufferedReader(new InputStreamReader(System.in));
+			
+			while(true) {
+				displayMainMenu();
+				int menuOption=getMainMenuOption();
+				System.out.println("You selected " + menuOption);
+				processMainMenuOption(menuOption);
+			}
+			}
+			catch (Exception e) {
+				e.printStackTrace();
+			}
+
+	}
+	
+	/**
+	 * Get menu options
+	 * @return
+	 * @throws Exception
+	 */
+	public int getMainMenuOption() throws Exception{
+		int menuOption= -1;
+		String inputString = bufferedReader.readLine();
+		
+		if(isValidMenuOption(inputString,new Integer[] {1,2})) {
+			menuOption = Integer.parseInt(inputString);
+		}else {
+			message = "Invalid Selection";
+			displayMainMenu();
+			getMainMenuOption();
+		}
+		return menuOption;
+	}
+	/**
+	 * Is Valid Menu Option
+	 * @param inputString
+	 * @param integers
+	 * @return
+	 */
+	private boolean isValidMenuOption(String inputString,Integer[] integers) {
+		try {
+			Integer input = Integer.parseInt(inputString);
+			
+			for (Integer integer : integers) {
+				if(input.intValue()==integer.intValue()) {
+					return true;
+				}
+			}
+		}catch(NumberFormatException nfe) {
+			return false;
+		}
+		return false;
+	}
+	/**
+	 * Process Main Menu Option
+	 * @param menuOption
+	 * @throws Exception
+	 */
+	private void processMainMenuOption(int menuOption) throws Exception {
+		switch(menuOption) {
+			case 1:displayGameMenu();
+				break;
+			case 2:quit(0);
+				break;
+		}
+	}
+	/**
+	 * Quit
+	 * @param exit code
+	 */
+	public void quit(int exitCode) {
+		System.out.println("\n\nGood Bye!");
+		try {bufferedReader.close();} catch(Exception e) {}
+		System.exit(exitCode);
+	}
+	/**
+	 * Display Game Menu
+	 * @throws IOException
+	 */
+	private void displayGameMenu() throws IOException{
+		System.out.println("\n\n");
+		System.out.println("********************************");
+		System.out.println("*        Rock Paper Scissor      ");
+		System.out.println("*********************************");
+		System.out.println(" 1.Rock                          ");
+		System.out.println(" 2.Paper                         ");
+		System.out.println(" 3.Scissors                      ");
+		System.out.println("*********************************");
+		
+		if (message != null && message.length()>0) {
+			System.out.println(message);
+			message = "";
+		}
+		
+		System.out.println("Select (1)Rock,(2)Paper,(3)Scissors: ");
+		int gameMenuOption = getGameMenuOption();
+		processGameMenuOption(gameMenuOption);
+	}
+	/**
+	 * Get Game Menu Option
+	 * @return
+	 * @throws IOException
+	 */
+	public int getGameMenuOption() throws IOException{
+		int gameMenuOption= -1;
+		String inputString = bufferedReader.readLine();
+		
+		if(isValidMenuOption(inputString,new Integer[] {1,2,3})) {
+			gameMenuOption = Integer.parseInt(inputString);
+		}else {
+			message = "Invalid Selection";
+			displayGameMenu();
+			getGameMenuOption();
+		}
+		return gameMenuOption;
+	}
+	/**
+	 * Process Game Menu Option
+	 * @param gameMenOption
+	 * @throws IOException
+	 */
+	private void processGameMenuOption(int userSelection) throws IOException{
+		int computerSelection = getRandomNumber(1,3);
+		boolean selectionMatch = (userSelection == computerSelection);
+		
+		if(selectionMatch) {
+			message = "You both selected: " + getLiteralSelection(userSelection) +"\n";
+			displayGameMenu();
+		}else {
+			StringBuilder sb = new StringBuilder();
+			sb.append("Your selection   :" + getLiteralSelection(userSelection)+"\n");
+			sb.append("Computer selection   :" + getLiteralSelection(computerSelection)+"\n");
+			
+			switch(userSelection) {
+			case(1)://Rock
+				switch(computerSelection) {
+				case(2):sb.append("Paper covers rock.You Lose!");break;
+				case(3):sb.append("Rock crushes scissors. You Win!");break;
+				}
+				break;
+			case(2)://Paper
+				switch(computerSelection) {
+				case(1):sb.append("Paper covers rock. You win!");break;
+				case(3):sb.append("Scissors cut paper.You lose!");break;
+				}
+				break;
+			case(3)://Scissors
+				switch(computerSelection) {
+				case(1):sb.append("Rock crushes scissors. You lose!");break;
+				case(2):sb.append("Scissors cut paper. You win!");break;
+				}
+				break;
+			}
+			message =sb.toString();
+		}
+		
+	}
+	private int getRandomNumber(int min,int max) {
+		return random.nextInt(max-min +1) + min;
+	}
+	/**
+	 * Get Literal Selection
+	 * @param userSelection
+	 * @return
+	 */
+	private String getLiteralSelection(int selection) {
+		switch(selection) {
+			case(1):return "Rock";
+			case(2):return "Paper";
+			case(3):return "Scissors";
+			default:return "";
+			
+		}
+	}
+	/**
+	 * Clear the Console
+	 * This method works great in the Windows console.It does not
+	 * clear the console in Eclipse
+	 */
+	public static void clearTheConsole() {
+		try {
+			Thread.sleep(500);
+			new ProcessBuilder("cmd" , "/c" , "cls").inheritIO().start().waitFor();
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		new RockPaperScissors().playGame();
+
+	}	
+	
+}
